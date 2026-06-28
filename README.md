@@ -46,7 +46,8 @@
 ```
 
 Вся логика — в [`lib/`](lib/) (регистрация, билдеры) и [`config/`](config/) (DNS, эндпоинты,
-шаблоны Clash). Точка входа API — [`app/api/generate/route.ts`](app/api/generate/route.ts).
+шаблоны Clash). Точки входа — [`app/api/generate/route.ts`](app/api/generate/route.ts) (сайт)
+и [`app/api/telegram/route.ts`](app/api/telegram/route.ts) (Telegram-бот).
 
 ## Локальный запуск
 
@@ -104,6 +105,31 @@ netlify deploy --build --prod
 | WARP-эндпоинты в шаблонах (диапазоны/порты) | [`scripts/gen-endpoints.mjs`](scripts/gen-endpoints.mjs) → `npm run gen:endpoints` |
 | Параметры awg1.5 (Jc/Jmin/Jmax, H1–H4) | [`lib/builders/amneziawg.ts`](lib/builders/amneziawg.ts) |
 | I1-маски (awg1.5-сигнатура) | [`lib/i1-masks.ts`](lib/i1-masks.ts) |
+| Логика Telegram-бота | [`lib/telegram.ts`](lib/telegram.ts) |
+
+## Telegram-бот
+
+Тот же генератор доступен как Telegram-бот — вебхук [`app/api/telegram/route.ts`](app/api/telegram/route.ts)
+(общая логика в [`lib/telegram.ts`](lib/telegram.ts)), переиспользует ту же `generateConfig`.
+Работает бесплатно на Vercel/Netlify — это обычная
+serverless-функция, которую дёргает Telegram.
+
+Бот пошагово спрашивает формат → устройство/эндпоинт → DNS и присылает готовый `.conf`/`.yaml` файлом.
+
+Настройка:
+
+1. Создайте бота у [@BotFather](https://t.me/BotFather) → получите токен.
+2. В переменных окружения деплоя задайте `TELEGRAM_BOT_TOKEN` (опц. `TELEGRAM_WEBHOOK_SECRET` —
+   защита вебхука от посторонних запросов). Передеплойте.
+3. Привяжите вебхук — откройте один раз в браузере (адрес и секрет подставятся сами):
+
+   ```
+   https://<ваш-деплой>/api/telegram?token=<TELEGRAM_BOT_TOKEN>
+   ```
+
+   Должно вернуть `{"ok":true,...}`. Передеплой вебхук не сбрасывает — повторять не нужно.
+
+Готово — напишите боту `/start`.
 
 ## Замечание про serverless
 

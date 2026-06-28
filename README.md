@@ -9,6 +9,14 @@
 Вдохновлён [nellimonix/warp-config-generator-vercel](https://github.com/nellimonix/warp-config-generator-vercel),
 но намеренно упрощён: два формата, два DNS, два эндпоинта.
 
+## Зеркала
+
+Проект доступен по нескольким адресам — выбирайте любой:
+
+- https://warp-ru.duckdns.org/
+- https://warp-ru.vercel.app/
+- https://warp-ru.netlify.app/
+
 ## Что внутри
 
 - **Форматы:** AmneziaWG (`.conf`, awg1.5) и Clash (`.yaml`)

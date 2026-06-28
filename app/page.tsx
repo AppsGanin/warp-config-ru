@@ -20,7 +20,7 @@ export default function Home() {
       <footer className="footer">
         <a
           className="footer-link"
-          href="https://github.com/AppsGanin/warp-config-generator"
+          href="https://github.com/AppsGanin/warp-config-ru"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Открыть проект на GitHub"

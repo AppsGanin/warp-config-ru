@@ -1,0 +1,9 @@
+[build]
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# Next.js runtime for Netlify (auto-installed if omitted, declared here for clarity).
+[[plugins]]
+  package = "@netlify/plugin-nextjs"

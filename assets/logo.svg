@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 150" width="480" height="150" role="img" aria-label="WARP Config Generator">
+  <!-- paper-white panel (self-contained so it reads on light & dark READMEs) -->
+  <rect x="1" y="1" width="478" height="148" rx="18" fill="#ffffff" stroke="#e5e5e5" stroke-width="2"/>
+
+  <!-- terminal-window icon tile -->
+  <g transform="translate(31,31)">
+    <rect width="88" height="88" rx="20" fill="#0a0a0a"/>
+    <circle cx="20" cy="22" r="4.5" fill="#ff5f56"/>
+    <circle cx="36" cy="22" r="4.5" fill="#ffbd2e"/>
+    <circle cx="52" cy="22" r="4.5" fill="#27c93f"/>
+    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" transform="translate(19,30) scale(2)" fill="#ffffff"/>
+  </g>
+
+  <!-- wordmark -->
+  <text x="150" y="66" font-family="ui-rounded,'SF Pro Rounded',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif" font-size="48" font-weight="600" letter-spacing="-1" fill="#0a0a0a">WARP</text>
+  <text x="152" y="94" font-family="ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif" font-size="18" font-weight="500" fill="#737373">Config Generator</text>
+  <text x="152" y="117" font-family="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace" font-size="12.5" fill="#a3a3a3">AmneziaWG · Clash</text>
+</svg>

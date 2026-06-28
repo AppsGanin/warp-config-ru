@@ -72,7 +72,8 @@ a {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 48px 20px 32px;
+  padding: 56px 20px 32px;
+  background: radial-gradient(115% 55% at 50% -8%, #f5f6f7 0%, var(--canvas) 58%);
 }
 
 .container {
@@ -99,12 +100,45 @@ a {
   font-size: 16px;
 }
 
+.brand-mark {
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  border-radius: 15px;
+  box-shadow: 0 10px 24px -10px rgba(0, 0, 0, 0.4), 0 2px 6px -2px rgba(0, 0, 0, 0.16);
+}
+
+.hero .eyebrow {
+  margin: 0 0 10px;
+  max-width: none;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+/* Card -------------------------------------------------------------------- */
+.card {
+  background: var(--canvas);
+  border: 1px solid var(--hairline);
+  border-radius: 16px;
+  padding: 28px 24px 24px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 18px 40px -24px rgba(0, 0, 0, 0.22);
+}
+
 /* Form fields ------------------------------------------------------------- */
 .field {
   margin-bottom: 24px;
   border: 0;
   padding: 0;
   margin-inline: 0;
+}
+
+.field:last-of-type {
+  margin-bottom: 20px;
 }
 
 .field-label {
@@ -154,6 +188,7 @@ a {
   background: var(--canvas);
   border-color: var(--hairline-strong);
   color: var(--ink);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 
 /* Buttons ----------------------------------------------------------------- */
@@ -171,21 +206,34 @@ a {
   font-size: 14px;
   font-weight: 500;
   line-height: 1;
-  height: 44px;
+  height: 46px;
   padding: 0 20px;
   border-radius: var(--r-full);
   cursor: pointer;
-  transition: background-color 0.12s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16), 0 10px 22px -10px rgba(0, 0, 0, 0.5);
+  transition: background-color 0.12s ease, transform 0.08s ease, box-shadow 0.16s ease;
 }
 
 .btn-primary:hover:not(:disabled) {
   background: var(--ink-deep);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.18), 0 16px 28px -12px rgba(0, 0, 0, 0.55);
+}
+
+.btn-primary:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16);
 }
 
 .btn-primary:disabled {
   background: var(--surface-soft);
   color: var(--mute);
   cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn-icon {
+  flex: none;
 }
 
 .btn-secondary {
@@ -257,6 +305,7 @@ a {
   background: var(--canvas);
   color: var(--body);
   overflow: hidden;
+  box-shadow: 0 24px 60px -16px rgba(0, 0, 0, 0.4);
 }
 
 .modal::backdrop {
@@ -268,6 +317,7 @@ a {
   flex-direction: column;
   max-height: calc(100dvh - 48px);
   padding: 24px;
+  overflow-y: auto;
 }
 
 .modal-head {
@@ -366,12 +416,82 @@ a {
   margin-top: 16px;
 }
 
+/* Import guide ------------------------------------------------------------ */
+.guide-card {
+  margin-top: 16px;
+  background: var(--surface-soft);
+  border: 1px solid var(--hairline);
+  border-radius: 16px;
+  padding: 22px 24px;
+}
+
+/* divider only when the guide sits inside the result modal */
+.modal-inner .guide {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--hairline);
+}
+
+.guide-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 10px;
+}
+
+.guide-steps {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--charcoal);
+}
+
+.guide-steps li::marker {
+  color: var(--mute);
+  font-variant-numeric: tabular-nums;
+}
+
+.guide-link {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--hairline-strong);
+  padding-bottom: 1px;
+}
+
+.guide-link:hover {
+  border-bottom-color: var(--ink);
+}
+
 .footer {
   margin-top: auto;
   padding-top: 56px;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
   font-size: 12px;
   color: var(--mute);
+}
+
+.footer-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--mute);
+  transition: color 0.12s ease, transform 0.12s ease;
+}
+
+.footer-link:hover {
+  color: var(--ink);
+  transform: translateY(-1px);
 }
 
 .visually-hidden {

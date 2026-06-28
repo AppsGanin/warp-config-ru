@@ -8,6 +8,9 @@
 /out/
 next-env.d.ts
 
+# typescript
+*.tsbuildinfo
+
 # production
 /build
 

@@ -21,6 +21,52 @@ const DNS_OPTIONS = DNS_PROVIDERS.map((p) => ({ value: p.id, label: p.label }));
 const ENDPOINT_OPTIONS = ENDPOINTS.map((e) => ({ value: e.id, label: e.label }));
 const DEVICE_OPTIONS = CLASH_DEVICES.map((d) => ({ value: d.id, label: d.label }));
 
+type Guide = { app: string; url: string; steps: string[] };
+
+const AMNEZIA_GUIDE: Guide = {
+  app: "AmneziaVPN",
+  url: "https://amnezia.org/ru/downloads",
+  steps: [
+    "Установите AmneziaVPN — обычные WireGuard-клиенты не поддерживают awg-обфускацию.",
+    "Откройте приложение → «+» → «У меня есть данные для подключения».",
+    "Импортируйте скачанный файл .conf (или вставьте текст конфига).",
+    "Выберите протокол AmneziaWG и нажмите «Подключиться».",
+  ],
+};
+
+const CLASH_GUIDE: Record<ClashDevice, Guide> = {
+  computer: {
+    app: "Clash Verge Rev",
+    url: "https://github.com/clash-verge-rev/clash-verge-rev/releases",
+    steps: [
+      "Установите Clash Verge Rev (Windows / macOS / Linux).",
+      "Профили → «+» → тип «Локальный файл» → выберите скачанный .yaml (или перетащите).",
+      "Кликните по профилю, чтобы активировать его.",
+      "Включите TUN Mode и/или системный прокси.",
+    ],
+  },
+  mobile: {
+    app: "FlClash",
+    url: "https://github.com/chen08209/FlClash/releases",
+    steps: [
+      "Android: поставьте FlClash или Clash Meta for Android. iOS: Stash или Shadowrocket (платные).",
+      "Откройте приложение → Профили → «+» → импорт из файла.",
+      "Выберите скачанный .yaml (или «Поделиться» файлом в приложение).",
+      "Активируйте профиль и нажмите «Подключить».",
+    ],
+  },
+  router: {
+    app: "OpenClash",
+    url: "https://github.com/vernesong/OpenClash",
+    steps: [
+      "На роутере с OpenWrt установите OpenClash (ядро mihomo).",
+      "LuCI → Services → OpenClash → Config Manage → загрузите скачанный .yaml.",
+      "Выберите его активным конфигом → Save & Apply.",
+      "Запустите OpenClash (Enable).",
+    ],
+  },
+};
+
 function Segmented<T extends string>({
   label,
   value,
@@ -49,6 +95,29 @@ function Segmented<T extends string>({
         ))}
       </div>
     </fieldset>
+  );
+}
+
+function ImportGuide({
+  format,
+  device,
+}: {
+  format: ConfigFormat;
+  device: ClashDevice;
+}) {
+  const g = format === "amneziawg" ? AMNEZIA_GUIDE : CLASH_GUIDE[device];
+  return (
+    <section className="guide">
+      <h3 className="guide-title">Как подключить</h3>
+      <ol className="guide-steps">
+        {g.steps.map((s, i) => (
+          <li key={i}>{s}</li>
+        ))}
+      </ol>
+      <a className="guide-link" href={g.url} target="_blank" rel="noopener noreferrer">
+        Скачать {g.app} ↗
+      </a>
+    </section>
   );
 }
 
@@ -125,7 +194,7 @@ export default function Generator() {
 
   return (
     <>
-      <form onSubmit={onSubmit}>
+      <form onSubmit={onSubmit} className="card">
         <Segmented
           label="Формат"
           value={format}
@@ -165,7 +234,19 @@ export default function Generator() {
               Генерация…
             </>
           ) : (
-            "Сгенерировать"
+            <>
+              <svg
+                className="btn-icon"
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                aria-hidden="true"
+              >
+                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+              </svg>
+              Сгенерировать
+            </>
           )}
         </button>
       </form>
@@ -176,6 +257,10 @@ export default function Generator() {
             {error}
           </p>
         )}
+      </div>
+
+      <div className="guide-card">
+        <ImportGuide format={format} device={device} />
       </div>
 
       <dialog
@@ -223,6 +308,8 @@ export default function Generator() {
                 Скачать
               </button>
             </div>
+
+            <ImportGuide format={result.format} device={device} />
           </div>
         )}
       </dialog>

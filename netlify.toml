@@ -1,5 +1,7 @@
 [build]
   command = "npm run build"
+  # Next.js runtime publishes the build output; must differ from the repo root.
+  publish = ".next"
 
 [build.environment]
   NODE_VERSION = "22"

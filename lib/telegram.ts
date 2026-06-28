@@ -77,13 +77,24 @@ async function edit(chatId: number, messageId: number, text: string, rows: Btn[]
   });
 }
 
-async function sendDocument(chatId: number, fileName: string, content: string, caption: string): Promise<void> {
+async function sendDocument(
+  chatId: number,
+  fileName: string,
+  content: string,
+  caption: string,
+  rows?: Btn[][],
+): Promise<void> {
   const form = new FormData();
   form.append("chat_id", String(chatId));
   form.append("caption", caption);
   form.append("parse_mode", "HTML");
+  if (rows) form.append("reply_markup", JSON.stringify(kb(rows)));
   form.append("document", new Blob([content], { type: "text/plain" }), fileName);
   await fetch(`${API}/sendDocument`, { method: "POST", body: form });
+}
+
+async function deleteMessage(chatId: number, messageId: number): Promise<void> {
+  await tg("deleteMessage", { chat_id: chatId, message_id: messageId });
 }
 
 // ── Wizard menus ──────────────────────────────────────────────────────────
@@ -167,10 +178,43 @@ async function onCallback(cq: TgCallback): Promise<void> {
   const [kind, p1, p2, p3] = data.split(":");
   const show = (menu: Menu) => edit(chatId, messageId, menu.text, menu.rows);
 
+  // "Ещё конфиг" обычно приходит с сообщения-файла (его текст editMessageText
+  // не правит), поэтому начинаем заново новым сообщением.
+  if (kind === "restart") {
+    await answer(cq.id);
+    const menu = formatMenu();
+    await send(chatId, menu.text, menu.rows);
+    return;
+  }
+
+  if (kind === "g") {
+    await answer(cq.id);
+    await edit(chatId, messageId, "⏳ Генерирую конфиг…", []);
+    const format: ConfigFormat = p1 === "clash" ? "clash" : "amneziawg";
+    const dnsId: DnsId = p3 === "xbox" ? "xbox" : "geohide";
+    try {
+      const result = await generateConfig({
+        format,
+        dnsId,
+        endpointId: format === "amneziawg" ? ((p2 === "alt" ? "alt" : "default") as EndpointId) : undefined,
+        device:
+          format === "clash"
+            ? ((p2 === "mobile" || p2 === "router" ? p2 : "computer") as ClashDevice)
+            : undefined,
+      });
+      // Результат — одно сообщение: сам файл, со сводкой и подсказкой в подписи
+      // и кнопкой «Ещё конфиг». Служебное «Генерирую…» удаляем.
+      const caption = `✅ <b>Готово!</b>\n\n${summary(format, p2, p3)}\n\n${captionFor(format)}`;
+      await sendDocument(chatId, result.fileName, result.config, caption, [[btn("🔄 Ещё конфиг", "restart")]]);
+      await deleteMessage(chatId, messageId);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Неизвестная ошибка";
+      await edit(chatId, messageId, `⚠️ Не получилось: ${esc(msg)}`, [[btn("🔄 Заново", "restart")]]);
+    }
+    return;
+  }
+
   switch (kind) {
-    case "restart":
-      await show(formatMenu());
-      break;
     case "back":
       await show(p1 === "amneziawg" ? endpointMenu() : p1 === "clash" ? deviceMenu() : formatMenu());
       break;
@@ -183,31 +227,6 @@ async function onCallback(cq: TgCallback): Promise<void> {
     case "d":
       await show(dnsMenu("clash", p1));
       break;
-    case "g": {
-      await answer(cq.id);
-      await edit(chatId, messageId, "⏳ Генерирую конфиг…", []);
-      const format: ConfigFormat = p1 === "clash" ? "clash" : "amneziawg";
-      const dnsId: DnsId = p3 === "xbox" ? "xbox" : "geohide";
-      try {
-        const result = await generateConfig({
-          format,
-          dnsId,
-          endpointId: format === "amneziawg" ? ((p2 === "alt" ? "alt" : "default") as EndpointId) : undefined,
-          device:
-            format === "clash"
-              ? ((p2 === "mobile" || p2 === "router" ? p2 : "computer") as ClashDevice)
-              : undefined,
-        });
-        await edit(chatId, messageId, `✅ <b>Готово!</b>\n\n${summary(format, p2, p3)}\n\nФайл — ниже 👇`, [
-          [btn("🔄 Ещё конфиг", "restart")],
-        ]);
-        await sendDocument(chatId, result.fileName, result.config, captionFor(format));
-      } catch (err) {
-        const msg = err instanceof Error ? err.message : "Неизвестная ошибка";
-        await edit(chatId, messageId, `⚠️ Не получилось: ${esc(msg)}`, [[btn("🔄 Заново", "restart")]]);
-      }
-      return;
-    }
   }
   await answer(cq.id);
 }

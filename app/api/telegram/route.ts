@@ -3,7 +3,7 @@ import {
   TELEGRAM_TOKEN,
   WEBHOOK_SECRET,
   handleUpdate,
-  setWebhook,
+  registerBot,
   type TgUpdate,
 } from "@/lib/telegram";
 
@@ -50,6 +50,6 @@ export async function GET(req: Request): Promise<NextResponse> {
 
   const host = req.headers.get("host");
   const proto = req.headers.get("x-forwarded-proto") ?? "https";
-  const data = await setWebhook(`${proto}://${host}/api/telegram`);
+  const data = await registerBot(`${proto}://${host}/api/telegram`);
   return NextResponse.json({ ok: data.ok === true, telegram: data });
 }

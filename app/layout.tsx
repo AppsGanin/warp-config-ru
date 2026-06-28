@@ -1,10 +1,23 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
+const TITLE = "WARP Config Generator";
+const DESCRIPTION =
+  "Рабочие конфиги Cloudflare WARP за пару секунд — AmneziaWG и Clash, со свежими ключами.";
+
 export const metadata: Metadata = {
-  title: "WARP Config Generator",
-  description:
-    "Генератор конфигов Cloudflare WARP в форматах AmneziaWG и Clash.",
+  title: TITLE,
+  description: DESCRIPTION,
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 };
 
 export const viewport: Viewport = {

@@ -2,6 +2,26 @@
   <img src="assets/logo.svg" alt="WARP Config Generator" width="460">
 </p>
 
+<p align="center">
+  <b>Рабочие конфиги Cloudflare WARP за пару секунд — AmneziaWG и Clash, со свежими ключами.</b>
+</p>
+
+<p align="center">
+  <a href="https://github.com/AppsGanin/warp-config-generator/stargazers"><img src="https://img.shields.io/github/stars/AppsGanin/warp-config-generator?style=for-the-badge&logo=github&color=FFD33D&labelColor=24292e" alt="Stars"></a>
+  <img src="https://img.shields.io/badge/Next.js-15-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js 15">
+  <img src="https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript">
+  <a href="https://t.me/warpgenrubot"><img src="https://img.shields.io/badge/Telegram-%40warpgenrubot-2CA5E0?style=for-the-badge&logo=telegram&logoColor=white" alt="Telegram bot"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/AppsGanin/warp-config-generator?style=for-the-badge&color=22c55e" alt="License: MIT"></a>
+</p>
+
+<p align="center">
+  <a href="https://warp-ru.vercel.app/">🌐 Открыть генератор</a> &nbsp;·&nbsp; <a href="https://t.me/warpgenrubot">🤖 Telegram-бот</a>
+</p>
+
+<p align="center">
+  ⭐ <b>Если проект пригодился — поставьте звезду! Это бесплатно и реально мотивирует развивать его дальше.</b>
+</p>
+
 Минималистичный генератор конфигов Cloudflare WARP в форматах **AmneziaWG 1.5** и
 **Clash**. Для каждой генерации создаётся свежая пара ключей X25519 и регистрируется
 через официальный WARP API, поэтому конфиги рабочие «из коробки».
@@ -9,15 +29,16 @@
 Вдохновлён [nellimonix/warp-config-generator-vercel](https://github.com/nellimonix/warp-config-generator-vercel),
 но намеренно упрощён: два формата, два DNS, два эндпоинта.
 
-## Зеркала
+## 🪞 Зеркала
 
 Проект доступен по нескольким адресам — выбирайте любой:
 
-- https://warp-ru.duckdns.org/
-- https://warp-ru.vercel.app/
-- https://warp-ru.netlify.app/
+- 🌐 https://warp-ru.duckdns.org/
+- ▲ https://warp-ru.vercel.app/
+- 🔷 https://warp-ru.netlify.app/
+- 🤖 Telegram-бот: [@warpgenrubot](https://t.me/warpgenrubot)
 
-## Что внутри
+## ✨ Что внутри
 
 - **Форматы:** AmneziaWG (`.conf`, awg1.5) и Clash (`.yaml`)
 - **DNS:** `dns.geohide.ru` и `xbox-dns.ru`
@@ -26,15 +47,16 @@
   [`config/templates/`](config/templates/) — на основе
   [codelabhq/clash-warp-config](https://github.com/codelabhq/clash-warp-config), но
   переработаны: без релеев, со своей структурой групп и расширенным пулом WARP-эндпоинтов
+- 🤖 **Telegram-бот** с тем же генератором — на случай, когда сайт недоступен
 - Результат открывается в модальном окне: копирование и скачивание файла
 
-## Стек
+## 🧰 Стек
 
 - Next.js 15 (App Router) + React 19 + TypeScript
 - Генерация ключей — нативный `node:crypto` (X25519), без внешних крипто-зависимостей
 - Без UI-фреймворков: чистый CSS по дизайн-системе из `DESIGN.md`
 
-## Как это работает
+## ⚙️ Как это работает
 
 ```
 ключи X25519  ──►  POST /reg (Cloudflare)  ──►  PATCH /reg/{id} warp_enabled
@@ -49,7 +71,7 @@
 шаблоны Clash). Точки входа — [`app/api/generate/route.ts`](app/api/generate/route.ts) (сайт)
 и [`app/api/telegram/route.ts`](app/api/telegram/route.ts) (Telegram-бот).
 
-## Локальный запуск
+## 💻 Локальный запуск
 
 ```bash
 npm install
@@ -63,7 +85,10 @@ npm run build
 npm start
 ```
 
-## Деплой
+## 🚀 Деплой
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/AppsGanin/warp-config-generator) &nbsp;
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/AppsGanin/warp-config-generator)
 
 ### Vercel
 
@@ -94,7 +119,7 @@ npm i -g netlify-cli
 netlify deploy --build --prod
 ```
 
-## Где что менять
+## 🗂️ Где что менять
 
 | Нужно изменить | Файл |
 |---|---|
@@ -107,12 +132,11 @@ netlify deploy --build --prod
 | I1-маски (awg1.5-сигнатура) | [`lib/i1-masks.ts`](lib/i1-masks.ts) |
 | Логика Telegram-бота | [`lib/telegram.ts`](lib/telegram.ts) |
 
-## Telegram-бот
+## 🤖 Telegram-бот
 
 Тот же генератор доступен как Telegram-бот — вебхук [`app/api/telegram/route.ts`](app/api/telegram/route.ts)
 (общая логика в [`lib/telegram.ts`](lib/telegram.ts)), переиспользует ту же `generateConfig`.
-Работает бесплатно на Vercel/Netlify — это обычная
-serverless-функция, которую дёргает Telegram.
+Работает бесплатно на Vercel/Netlify — это обычная serverless-функция, которую дёргает Telegram.
 
 Бот пошагово спрашивает формат → устройство/эндпоинт → DNS и присылает готовый `.conf`/`.yaml` файлом.
 
@@ -131,9 +155,23 @@ serverless-функция, которую дёргает Telegram.
 
 Готово — напишите боту `/start`.
 
-## Замечание про serverless
+## ☁️ Замечание про serverless
 
 WARP API (`api.cloudflareclient.com`) иногда ограничивает регистрацию с IP облачных
 провайдеров. Если на Vercel/Netlify регистрация начнёт отдавать ошибки HTTP 429/403 —
 это лимит со стороны Cloudflare, а не баг генератора. Запросы к WARP идут с таймаутом
 и понятной ошибкой в ответе API.
+
+## ⭐ Поддержать
+
+Понравился проект? **Поставьте звезду** — это секунда, бесплатно и сильно помогает.
+Нашли баг или есть идея — открывайте [issue](https://github.com/AppsGanin/warp-config-generator/issues)
+или PR.
+
+<p align="center">
+  <a href="https://github.com/AppsGanin/warp-config-generator/stargazers"><img src="https://img.shields.io/github/stars/AppsGanin/warp-config-generator?style=social" alt="Star on GitHub"></a>
+</p>
+
+## 📄 Лицензия
+
+[MIT](LICENSE) © 2026 Dmitry Ganin

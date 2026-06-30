@@ -470,6 +470,46 @@ a {
   border-bottom-color: var(--ink);
 }
 
+/* Sponsor block (optional, toggled via config/sponsor.ts) ----------------- */
+/* divider only when the sponsor sits inside the result modal */
+.modal-inner .sponsor {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--hairline);
+}
+
+.sponsor-tag {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--mute);
+  margin-bottom: 8px;
+}
+
+.sponsor-text {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--charcoal);
+}
+
+.sponsor-cta {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--hairline-strong);
+  padding-bottom: 1px;
+}
+
+.sponsor-cta:hover {
+  border-bottom-color: var(--ink);
+}
+
 .footer {
   margin-top: auto;
   padding-top: 56px;

@@ -12,6 +12,7 @@ import type {
 import { DNS_PROVIDERS } from "@/config/dns";
 import { ENDPOINTS } from "@/config/endpoints";
 import { CLASH_DEVICES } from "@/config/clash-templates";
+import type { Sponsor } from "@/config/sponsor";
 
 const FORMAT_OPTIONS: readonly { value: ConfigFormat; label: string }[] = [
   { value: "amneziawg", label: "Amnezia" },
@@ -121,7 +122,24 @@ function ImportGuide({
   );
 }
 
-export default function Generator() {
+function SponsorBlock({ sponsor }: { sponsor: Sponsor }) {
+  return (
+    <aside className="sponsor">
+      <span className="sponsor-tag">{sponsor.title}</span>
+      <p className="sponsor-text">{sponsor.text}</p>
+      <a
+        className="sponsor-cta"
+        href={sponsor.url}
+        target="_blank"
+        rel="sponsored noopener noreferrer"
+      >
+        {sponsor.cta}
+      </a>
+    </aside>
+  );
+}
+
+export default function Generator({ sponsor }: { sponsor: Sponsor | null }) {
   const [format, setFormat] = useState<ConfigFormat>("amneziawg");
   const [dnsId, setDnsId] = useState<DnsId>("geohide");
   const [endpointId, setEndpointId] = useState<EndpointId>("default");
@@ -259,6 +277,12 @@ export default function Generator() {
         )}
       </div>
 
+      {sponsor && (
+        <div className="guide-card sponsor-card">
+          <SponsorBlock sponsor={sponsor} />
+        </div>
+      )}
+
       <div className="guide-card">
         <ImportGuide format={format} device={device} />
       </div>
@@ -308,6 +332,8 @@ export default function Generator() {
                 Скачать
               </button>
             </div>
+
+            {sponsor && <SponsorBlock sponsor={sponsor} />}
 
             <ImportGuide format={result.format} device={device} />
           </div>

@@ -2,6 +2,7 @@ import { generateConfig } from "./warp";
 import { DNS_PROVIDERS } from "@/config/dns";
 import { ENDPOINTS } from "@/config/endpoints";
 import { CLASH_DEVICES } from "@/config/clash-templates";
+import { SPONSOR, isSponsorEnabled } from "@/config/sponsor";
 import type { ClashDevice, ConfigFormat, DnsId, EndpointId } from "@/types";
 
 // Shared Telegram-bot logic, used by the webhook route (app/api/telegram).
@@ -151,6 +152,12 @@ function captionFor(format: ConfigFormat): string {
     : "📥 <b>Импорт:</b> добавьте как профиль в Clash Verge Rev / FlClash / OpenClash.";
 }
 
+/** Спонсорская строка для подписи к файлу (пусто, если блок выключен). */
+function sponsorLine(): string {
+  if (!isSponsorEnabled()) return "";
+  return `\n\n💎 <b>${esc(SPONSOR.title)}:</b> ${esc(SPONSOR.text)}\n<a href="${esc(SPONSOR.url)}">${esc(SPONSOR.cta)}</a>`;
+}
+
 // ── Handlers ──────────────────────────────────────────────────────────────
 async function onMessage(m: TgMessage): Promise<void> {
   if (m.text === "/help") {
@@ -204,7 +211,7 @@ async function onCallback(cq: TgCallback): Promise<void> {
       });
       // Результат — одно сообщение: сам файл, со сводкой и подсказкой в подписи
       // и кнопкой «Ещё конфиг». Служебное «Генерирую…» удаляем.
-      const caption = `✅ <b>Готово!</b>\n\n${summary(format, p2, p3)}\n\n${captionFor(format)}`;
+      const caption = `✅ <b>Готово!</b>\n\n${summary(format, p2, p3)}\n\n${captionFor(format)}${sponsorLine()}`;
       await sendDocument(chatId, result.fileName, result.config, caption, [[btn("🔄 Ещё конфиг", "restart")]]);
       await deleteMessage(chatId, messageId);
     } catch (err) {

@@ -1,6 +1,8 @@
 import Generator from "@/components/Generator";
+import { SPONSOR, isSponsorEnabled } from "@/config/sponsor";
 
 export default function Home() {
+  const sponsor = isSponsorEnabled() ? SPONSOR : null;
   return (
     <main className="page">
       <div className="container">
@@ -14,7 +16,7 @@ export default function Home() {
           </p>
         </header>
 
-        <Generator />
+        <Generator sponsor={sponsor} />
       </div>
 
       <footer className="footer">

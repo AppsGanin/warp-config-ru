@@ -3,6 +3,7 @@ import { DNS_PROVIDERS } from "@/config/dns";
 import { ENDPOINTS } from "@/config/endpoints";
 import { CLASH_DEVICES } from "@/config/clash-templates";
 import { SPONSOR, isSponsorEnabled } from "@/config/sponsor";
+import { DONATE_URL } from "@/config/donate";
 import type { ClashDevice, ConfigFormat, DnsId, EndpointId } from "@/types";
 
 // Shared Telegram-bot logic, used by the webhook route (app/api/telegram).
@@ -11,7 +12,7 @@ export const TELEGRAM_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 export const WEBHOOK_SECRET = process.env.TELEGRAM_WEBHOOK_SECRET;
 const API = `https://api.telegram.org/bot${TELEGRAM_TOKEN}`;
 
-type Btn = { text: string; callback_data: string };
+type Btn = { text: string; callback_data: string } | { text: string; url: string };
 type Menu = { text: string; rows: Btn[][] };
 interface TgChat {
   id: number;
@@ -40,6 +41,7 @@ const DEVICE_EMOJI: Record<ClashDevice, string> = { computer: "💻", mobile: "�
 
 const kb = (rows: Btn[][]) => ({ inline_keyboard: rows });
 const btn = (text: string, callback_data: string): Btn => ({ text, callback_data });
+const link = (text: string, url: string): Btn => ({ text, url });
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 const endpointLabel = (id: string) => ENDPOINTS.find((e) => e.id === id)?.label ?? id;
@@ -166,7 +168,9 @@ async function onMessage(m: TgMessage): Promise<void> {
       "Я генерирую рабочие конфиги <b>Cloudflare WARP</b> со свежими ключами.\n\n" +
         "• <b>AmneziaWG</b> (.conf) — для AmneziaVPN\n" +
         "• <b>Clash</b> (.yaml) — для Mihomo Party / FlClash / Nikki\n\n" +
-        "Нажмите /start, чтобы начать.",
+        "Нажмите /start, чтобы начать.\n\n" +
+        "❤️ Проект бесплатный — поддержать можно по кнопке ниже.",
+      [[link("❤️ Поддержать проект", DONATE_URL)]],
     );
     return;
   }
@@ -212,7 +216,10 @@ async function onCallback(cq: TgCallback): Promise<void> {
       // Результат — одно сообщение: сам файл, со сводкой и подсказкой в подписи
       // и кнопкой «Ещё конфиг». Служебное «Генерирую…» удаляем.
       const caption = `✅ <b>Готово!</b>\n\n${summary(format, p2, p3)}\n\n${captionFor(format)}${sponsorLine()}`;
-      await sendDocument(chatId, result.fileName, result.config, caption, [[btn("🔄 Ещё конфиг", "restart")]]);
+      await sendDocument(chatId, result.fileName, result.config, caption, [
+        [btn("🔄 Ещё конфиг", "restart")],
+        [link("❤️ Поддержать проект", DONATE_URL)],
+      ]);
       await deleteMessage(chatId, messageId);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Неизвестная ошибка";

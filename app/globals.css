@@ -470,15 +470,16 @@ a {
   border-bottom-color: var(--ink);
 }
 
-/* Sponsor block (optional, toggled via config/sponsor.ts) ----------------- */
-/* divider only when the sponsor sits inside the result modal */
-.modal-inner .sponsor {
+/* Callout block (optional, toggled via config/sponsor.ts) ----------------- */
+/* "callout" naming on purpose: ad-blockers hide elements named *sponsor*/*ad* */
+/* divider only when the callout sits inside the result modal */
+.modal-inner .callout {
   margin-top: 20px;
   padding-top: 18px;
   border-top: 1px solid var(--hairline);
 }
 
-.sponsor-tag {
+.callout-tag {
   display: inline-block;
   font-size: 10.5px;
   font-weight: 600;
@@ -488,14 +489,14 @@ a {
   margin-bottom: 8px;
 }
 
-.sponsor-text {
+.callout-text {
   margin: 0;
   font-size: 13.5px;
   line-height: 1.5;
   color: var(--charcoal);
 }
 
-.sponsor-cta {
+.callout-cta {
   display: inline-block;
   margin-top: 12px;
   font-size: 13px;
@@ -506,7 +507,7 @@ a {
   padding-bottom: 1px;
 }
 
-.sponsor-cta:hover {
+.callout-cta:hover {
   border-bottom-color: var(--ink);
 }
 

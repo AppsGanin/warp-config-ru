@@ -124,14 +124,14 @@ function ImportGuide({
 
 function SponsorBlock({ sponsor }: { sponsor: Sponsor }) {
   return (
-    <aside className="sponsor">
-      <span className="sponsor-tag">{sponsor.title}</span>
-      <p className="sponsor-text">{sponsor.text}</p>
+    <aside className="callout">
+      <span className="callout-tag">{sponsor.title}</span>
+      <p className="callout-text">{sponsor.text}</p>
       <a
-        className="sponsor-cta"
+        className="callout-cta"
         href={sponsor.url}
         target="_blank"
-        rel="sponsored noopener noreferrer"
+        rel="noopener noreferrer"
       >
         {sponsor.cta}
       </a>
@@ -278,7 +278,7 @@ export default function Generator({ sponsor }: { sponsor: Sponsor | null }) {
       </div>
 
       {sponsor && (
-        <div className="guide-card sponsor-card">
+        <div className="guide-card callout-card">
           <SponsorBlock sponsor={sponsor} />
         </div>
       )}

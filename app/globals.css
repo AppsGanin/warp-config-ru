@@ -471,7 +471,7 @@ a {
 }
 
 /* Callout block (optional, toggled via config/sponsor.ts) ----------------- */
-/* "callout" naming on purpose: ad-blockers hide elements named *sponsor*/*ad* */
+/* "callout" naming on purpose: ad-blockers hide ad/sponsor-named elements */
 /* divider only when the callout sits inside the result modal */
 .modal-inner .callout {
   margin-top: 20px;

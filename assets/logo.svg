@@ -1,18 +1,23 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 150" width="480" height="150" role="img" aria-label="WARP Config Generator">
-  <!-- paper-white panel (self-contained so it reads on light & dark READMEs) -->
-  <rect x="1" y="1" width="478" height="148" rx="18" fill="#ffffff" stroke="#e5e5e5" stroke-width="2"/>
+  <defs>
+    <linearGradient id="warp-tile" x1="0" y1="0" x2="88" y2="88" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fb923c"/>
+      <stop offset="1" stop-color="#ef7611"/>
+    </linearGradient>
+  </defs>
 
-  <!-- terminal-window icon tile -->
+  <!-- panel (self-contained so it reads on light & dark READMEs) -->
+  <rect x="1" y="1" width="478" height="148" rx="18" fill="#ffffff" stroke="#ece9e6" stroke-width="2"/>
+
+  <!-- Cloudflare-style cloud tile -->
   <g transform="translate(31,31)">
-    <rect width="88" height="88" rx="20" fill="#0a0a0a"/>
-    <circle cx="20" cy="22" r="4.5" fill="#ff5f56"/>
-    <circle cx="36" cy="22" r="4.5" fill="#ffbd2e"/>
-    <circle cx="52" cy="22" r="4.5" fill="#27c93f"/>
-    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" transform="translate(19,30) scale(2)" fill="#ffffff"/>
+    <rect width="88" height="88" rx="22" fill="url(#warp-tile)"/>
+    <path d="M19.35 10.04A7.49 7.49 0 0 0 12 4C9.11 4 6.6 5.64 5.35 8.04A5.994 5.994 0 0 0 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z"
+      transform="translate(16.4,16.4) scale(2.3)" fill="#ffffff"/>
   </g>
 
   <!-- wordmark -->
-  <text x="150" y="66" font-family="ui-rounded,'SF Pro Rounded',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif" font-size="48" font-weight="600" letter-spacing="-1" fill="#0a0a0a">WARP</text>
-  <text x="152" y="94" font-family="ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif" font-size="18" font-weight="500" fill="#737373">Config Generator</text>
-  <text x="152" y="117" font-family="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace" font-size="12.5" fill="#a3a3a3">AmneziaWG · Clash</text>
+  <text x="150" y="66" font-family="Manrope,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif" font-size="48" font-weight="800" letter-spacing="-1.5" fill="#1c1917">WARP</text>
+  <text x="152" y="94" font-family="Manrope,ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif" font-size="18" font-weight="600" fill="#57534e">Config Generator</text>
+  <text x="152" y="117" font-family="ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace" font-size="12.5" fill="#a8a29e">AmneziaWG · Clash</text>
 </svg>

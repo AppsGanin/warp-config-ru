@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/logo.svg" alt="WARP Config Generator" width="460">
+  <img src="assets/logo.svg" alt="WARP Config RU" width="460">
 </p>
 
 <p align="center">

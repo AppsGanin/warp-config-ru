@@ -102,7 +102,7 @@ async function deleteMessage(chatId: number, messageId: number): Promise<void> {
 function formatMenu(): Menu {
   return {
     text:
-      "👋 <b>WARP Config Generator</b>\n\n" +
+      "👋 <b>WARP Config RU</b>\n\n" +
       "Сгенерирую рабочий конфиг Cloudflare WARP со свежими ключами.\n\n" +
       "<b>Шаг 1 из 3</b> · Формат",
     rows: [[btn(`${FORMAT.amneziawg.emoji} AmneziaWG`, "f:amneziawg"), btn(`${FORMAT.clash.emoji} Clash`, "f:clash")]],
@@ -149,7 +149,7 @@ function summary(format: ConfigFormat, mid: string, dns: string): string {
 function captionFor(format: ConfigFormat): string {
   return format === "amneziawg"
     ? "📥 <b>Импорт:</b> откройте файл в AmneziaVPN (нужен клиент с поддержкой awg)."
-    : "📥 <b>Импорт:</b> добавьте как профиль в Clash Verge Rev / FlClash / OpenClash.";
+    : "📥 <b>Импорт:</b> добавьте как профиль в Mihomo Party / FlClash / Nikki.";
 }
 
 /** Спонсорская строка для подписи к файлу (пусто, если блок выключен). */
@@ -165,7 +165,7 @@ async function onMessage(m: TgMessage): Promise<void> {
       m.chat.id,
       "Я генерирую рабочие конфиги <b>Cloudflare WARP</b> со свежими ключами.\n\n" +
         "• <b>AmneziaWG</b> (.conf) — для AmneziaVPN\n" +
-        "• <b>Clash</b> (.yaml) — для Clash Verge Rev / FlClash / OpenClash\n\n" +
+        "• <b>Clash</b> (.yaml) — для Mihomo Party / FlClash / Nikki\n\n" +
         "Нажмите /start, чтобы начать.",
     );
     return;

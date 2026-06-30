@@ -1,548 +1,102 @@
+@import "tailwindcss";
+
+/* Class-based dark mode: toggling `.dark` on <html> flips the theme. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ---------------------------------------------------------------------------
+   Semantic tokens — Cloudflare-inspired warm palette.
+   Raw values live in :root / .dark under a private namespace; @theme inline
+   maps them onto Tailwind color utilities (bg-canvas, text-ink, border-hairline,
+   …) that resolve the vars at runtime, so one class follows the active theme.
+--------------------------------------------------------------------------- */
 :root {
-  /* Colors (from DESIGN.md — Ollama-style paper-white system) */
-  --primary: #000000;
-  --on-primary: #ffffff;
-  --ink: #000000;
-  --ink-deep: #090909;
-  --charcoal: #525252;
-  --body: #737373;
-  --mute: #a3a3a3;
-  --canvas: #ffffff;
-  --surface-soft: #fafafa;
-  --surface-dark: #171717;
-  --hairline: #e5e5e5;
-  --hairline-strong: #d4d4d4;
-  --focus-ring: rgba(59, 130, 246, 0.5);
-  --terminal-red: #ff5f56;
-  --terminal-yellow: #ffbd2e;
-  --terminal-green: #27c93f;
+  --t-canvas: #ffffff;
+  --t-surface: #ffffff;
+  --t-surface-soft: #faf9f7;
+  --t-ink: #1c1917;
+  --t-body: #57534e;
+  --t-mute: #a8a29e;
+  --t-hairline: #ece9e6;
+  --t-hairline-strong: #dcd8d3;
 
-  /* Radius */
-  --r-sm: 6px;
-  --r-md: 8px;
-  --r-lg: 12px;
-  --r-full: 9999px;
+  --t-brand: #f6821f;
+  --t-brand-hover: #e26f0c;
+  --t-on-brand: #ffffff;
+  --t-ring: rgba(246, 130, 31, 0.5);
 
-  /* Type */
-  --font-rounded: "SF Pro Rounded", ui-rounded, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --t-term-red: #ff5f56;
+  --t-term-yellow: #ffbd2e;
+  --t-term-green: #27c93f;
+
+  /* Page backdrop — warm orange wash fading to canvas */
+  --page-glow: radial-gradient(120% 60% at 50% -10%, #fef0e2 0%, var(--t-canvas) 55%);
 }
 
-* {
-  box-sizing: border-box;
+.dark {
+  --t-canvas: #0c0a09;
+  --t-surface: #1c1917;
+  --t-surface-soft: #231f1d;
+  --t-ink: #fafaf9;
+  --t-body: #a8a29e;
+  --t-mute: #78716c;
+  --t-hairline: #2b2623;
+  --t-hairline-strong: #3a342f;
+
+  --t-brand: #fb923c;
+  --t-brand-hover: #fdba74;
+  --t-on-brand: #1c1917;
+  --t-ring: rgba(251, 146, 60, 0.55);
+
+  --page-glow: radial-gradient(120% 60% at 50% -10%, #2a1a0d 0%, var(--t-canvas) 52%);
 }
 
-html,
-body {
-  margin: 0;
-  padding: 0;
+@theme inline {
+  --color-canvas: var(--t-canvas);
+  --color-surface: var(--t-surface);
+  --color-surface-soft: var(--t-surface-soft);
+  --color-ink: var(--t-ink);
+  --color-body: var(--t-body);
+  --color-mute: var(--t-mute);
+  --color-hairline: var(--t-hairline);
+  --color-hairline-strong: var(--t-hairline-strong);
+  --color-brand: var(--t-brand);
+  --color-brand-hover: var(--t-brand-hover);
+  --color-on-brand: var(--t-on-brand);
+  --color-ring: var(--t-ring);
+  --color-term-red: var(--t-term-red);
+  --color-term-yellow: var(--t-term-yellow);
+  --color-term-green: var(--t-term-green);
+
+  --font-sans: var(--font-sans-ui), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: var(--font-mono-code), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-body {
-  background: var(--canvas);
-  color: var(--body);
-  font-family: var(--font-sans);
-  font-size: 16px;
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
-
-h1,
-h2,
-h3 {
-  font-family: var(--font-rounded);
-  color: var(--ink);
-  margin: 0;
-}
-
-a {
-  color: var(--ink);
-}
-
-:focus-visible {
-  outline: 3px solid var(--focus-ring);
-  outline-offset: 2px;
-}
-
-/* Layout ------------------------------------------------------------------ */
-.page {
-  min-height: 100dvh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 56px 20px 32px;
-  background: radial-gradient(115% 55% at 50% -8%, #f5f6f7 0%, var(--canvas) 58%);
-}
-
-.container {
-  width: 100%;
-  max-width: 640px;
-}
-
-.hero {
-  text-align: center;
-  margin-bottom: 40px;
-}
-
-.hero h1 {
-  font-size: 36px;
-  font-weight: 500;
-  line-height: 1.11;
-  margin-bottom: 12px;
-}
-
-.hero p {
-  margin: 0 auto;
-  max-width: 480px;
-  color: var(--body);
-  font-size: 16px;
-}
-
-.brand-mark {
-  display: block;
-  width: 64px;
-  height: 64px;
-  margin: 0 auto 16px;
-  border-radius: 15px;
-  box-shadow: 0 10px 24px -10px rgba(0, 0, 0, 0.4), 0 2px 6px -2px rgba(0, 0, 0, 0.16);
-}
-
-.hero .eyebrow {
-  margin: 0 0 10px;
-  max-width: none;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--mute);
-}
-
-/* Card -------------------------------------------------------------------- */
-.card {
-  background: var(--canvas);
-  border: 1px solid var(--hairline);
-  border-radius: 16px;
-  padding: 28px 24px 24px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04), 0 18px 40px -24px rgba(0, 0, 0, 0.22);
-}
-
-/* Form fields ------------------------------------------------------------- */
-.field {
-  margin-bottom: 24px;
-  border: 0;
-  padding: 0;
-  margin-inline: 0;
-}
-
-.field:last-of-type {
-  margin-bottom: 20px;
-}
-
-.field-label {
-  display: block;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--ink);
-  margin-bottom: 8px;
-}
-
-/* Segmented control (iOS-style: white selected pill on a soft track) */
-.segmented {
-  display: inline-flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  width: 100%;
-  background: var(--surface-soft);
-  border-radius: var(--r-full);
-  padding: 4px;
-}
-
-.segment {
-  flex: 1 1 auto;
-  min-width: 0;
-  appearance: none;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--body);
-  font-family: var(--font-sans);
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1;
-  padding: 9px 16px;
-  border-radius: var(--r-full);
-  cursor: pointer;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: background-color 0.12s ease, color 0.12s ease;
-}
-
-.segment:hover {
-  color: var(--ink);
-}
-
-.segment[aria-pressed="true"] {
-  background: var(--canvas);
-  border-color: var(--hairline-strong);
-  color: var(--ink);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
-}
-
-/* Buttons ----------------------------------------------------------------- */
-.btn-primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  width: 100%;
-  appearance: none;
-  border: 0;
-  background: var(--primary);
-  color: var(--on-primary);
-  font-family: var(--font-sans);
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1;
-  height: 46px;
-  padding: 0 20px;
-  border-radius: var(--r-full);
-  cursor: pointer;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16), 0 10px 22px -10px rgba(0, 0, 0, 0.5);
-  transition: background-color 0.12s ease, transform 0.08s ease, box-shadow 0.16s ease;
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: var(--ink-deep);
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.18), 0 16px 28px -12px rgba(0, 0, 0, 0.55);
-}
-
-.btn-primary:active:not(:disabled) {
-  transform: translateY(0);
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.16);
-}
-
-.btn-primary:disabled {
-  background: var(--surface-soft);
-  color: var(--mute);
-  cursor: not-allowed;
-  box-shadow: none;
-}
-
-.btn-icon {
-  flex: none;
-}
-
-.btn-secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  appearance: none;
-  background: var(--canvas);
-  color: var(--ink);
-  border: 1px solid var(--hairline-strong);
-  font-family: var(--font-sans);
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1;
-  height: 36px;
-  padding: 0 16px;
-  border-radius: var(--r-full);
-  cursor: pointer;
-  transition: background-color 0.12s ease;
-}
-
-.btn-secondary:hover {
-  background: var(--surface-soft);
-}
-
-/* Spinner ----------------------------------------------------------------- */
-.spinner {
-  width: 14px;
-  height: 14px;
-  border: 2px solid currentColor;
-  border-right-color: transparent;
-  border-radius: var(--r-full);
-  animation: spin 0.6s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
+@layer base {
+  html {
+    color-scheme: light;
   }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .spinner {
-    animation-duration: 1.5s;
+  html.dark {
+    color-scheme: dark;
   }
-}
 
-/* Error ------------------------------------------------------------------- */
-.error {
-  margin-top: 16px;
-  padding: 12px 16px;
-  border: 1px solid var(--hairline);
-  border-radius: var(--r-lg);
-  background: var(--surface-soft);
-  color: var(--charcoal);
-  font-size: 14px;
-}
+  body {
+    margin: 0;
+    background: var(--t-canvas);
+    color: var(--t-body);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
 
-/* Modal (native <dialog>) ------------------------------------------------- */
-.modal {
-  margin: auto;
-  width: calc(100vw - 32px);
-  max-width: 640px;
-  max-height: calc(100dvh - 48px);
-  padding: 0;
-  border: 1px solid var(--hairline);
-  border-radius: var(--r-lg);
-  background: var(--canvas);
-  color: var(--body);
-  overflow: hidden;
-  box-shadow: 0 24px 60px -16px rgba(0, 0, 0, 0.4);
-}
+  h1,
+  h2,
+  h3 {
+    color: var(--t-ink);
+    font-family: var(--font-sans);
+  }
 
-.modal::backdrop {
-  background: rgba(9, 9, 9, 0.42);
-}
-
-.modal-inner {
-  display: flex;
-  flex-direction: column;
-  max-height: calc(100dvh - 48px);
-  padding: 24px;
-  overflow-y: auto;
-}
-
-.modal-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.modal-close {
-  flex: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  appearance: none;
-  border: 1px solid var(--hairline-strong);
-  background: var(--canvas);
-  color: var(--ink);
-  border-radius: var(--r-full);
-  font-size: 13px;
-  line-height: 1;
-  cursor: pointer;
-  transition: background-color 0.12s ease;
-}
-
-.modal-close:hover {
-  background: var(--surface-soft);
-}
-
-/* Result / terminal card -------------------------------------------------- */
-.result-title {
-  font-size: 18px;
-  font-weight: 600;
-}
-
-.result-file {
-  display: inline-block;
-  margin-top: 4px;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  color: var(--mute);
-  word-break: break-all;
-}
-
-.terminal {
-  background: var(--canvas);
-  border: 1px solid var(--hairline);
-  border-radius: var(--r-lg);
-  overflow: hidden;
-}
-
-.terminal-bar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--hairline);
-}
-
-.dot {
-  width: 12px;
-  height: 12px;
-  border-radius: var(--r-full);
-}
-
-.dot-r {
-  background: var(--terminal-red);
-}
-.dot-y {
-  background: var(--terminal-yellow);
-}
-.dot-g {
-  background: var(--terminal-green);
-}
-
-.terminal pre {
-  margin: 0;
-  padding: 16px;
-  max-height: min(360px, 52dvh);
-  overflow: auto;
-  font-family: var(--font-mono);
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--ink);
-  white-space: pre;
-  tab-size: 2;
-}
-
-.actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 16px;
-}
-
-/* Import guide ------------------------------------------------------------ */
-.guide-card {
-  margin-top: 16px;
-  background: var(--surface-soft);
-  border: 1px solid var(--hairline);
-  border-radius: 16px;
-  padding: 22px 24px;
-}
-
-/* divider only when the guide sits inside the result modal */
-.modal-inner .guide {
-  margin-top: 20px;
-  padding-top: 18px;
-  border-top: 1px solid var(--hairline);
-}
-
-.guide-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--ink);
-  margin-bottom: 10px;
-}
-
-.guide-steps {
-  margin: 0;
-  padding-left: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 7px;
-  font-size: 13.5px;
-  line-height: 1.5;
-  color: var(--charcoal);
-}
-
-.guide-steps li::marker {
-  color: var(--mute);
-  font-variant-numeric: tabular-nums;
-}
-
-.guide-link {
-  display: inline-block;
-  margin-top: 12px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--ink);
-  text-decoration: none;
-  border-bottom: 1px solid var(--hairline-strong);
-  padding-bottom: 1px;
-}
-
-.guide-link:hover {
-  border-bottom-color: var(--ink);
-}
-
-/* Callout block (optional, toggled via config/sponsor.ts) ----------------- */
-/* "callout" naming on purpose: ad-blockers hide ad/sponsor-named elements */
-/* divider only when the callout sits inside the result modal */
-.modal-inner .callout {
-  margin-top: 20px;
-  padding-top: 18px;
-  border-top: 1px solid var(--hairline);
-}
-
-.callout-tag {
-  display: inline-block;
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--mute);
-  margin-bottom: 8px;
-}
-
-.callout-text {
-  margin: 0;
-  font-size: 13.5px;
-  line-height: 1.5;
-  color: var(--charcoal);
-}
-
-.callout-cta {
-  display: inline-block;
-  margin-top: 12px;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--ink);
-  text-decoration: none;
-  border-bottom: 1px solid var(--hairline-strong);
-  padding-bottom: 1px;
-}
-
-.callout-cta:hover {
-  border-bottom-color: var(--ink);
-}
-
-.footer {
-  margin-top: auto;
-  padding-top: 56px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  font-size: 12px;
-  color: var(--mute);
-}
-
-.footer-link {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--mute);
-  transition: color 0.12s ease, transform 0.12s ease;
-}
-
-.footer-link:hover {
-  color: var(--ink);
-  transform: translateY(-1px);
-}
-
-.visually-hidden {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
+  :focus-visible {
+    outline: 3px solid var(--t-ring);
+    outline-offset: 2px;
+  }
 }

@@ -25,7 +25,7 @@ const DEFAULT_ENABLED = true;
 export const SPONSOR: Sponsor = {
   title: "Реклама",
   text: "Хотите здесь рекламу? Напишите — место свободно.",
-  cta: "Связаться ↗",
+  cta: "Связаться",
   url: "https://t.me/duelist",
 };
 

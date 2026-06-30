@@ -37,11 +37,11 @@ const AMNEZIA_GUIDE: Guide = {
 
 const CLASH_GUIDE: Record<ClashDevice, Guide> = {
   computer: {
-    app: "Clash Verge Rev",
-    url: "https://github.com/clash-verge-rev/clash-verge-rev/releases",
+    app: "Mihomo Party",
+    url: "https://github.com/mihomo-party-org/mihomo-party/releases",
     steps: [
-      "Установите Clash Verge Rev (Windows / macOS / Linux).",
-      "Профили → «+» → тип «Локальный файл» → выберите скачанный .yaml (или перетащите).",
+      "Установите Mihomo Party (Windows / macOS / Linux) — есть английский интерфейс.",
+      "Subscriptions → Import → «Local File» → выберите скачанный .yaml (или перетащите).",
       "Кликните по профилю, чтобы активировать его.",
       "Включите TUN Mode и/или системный прокси.",
     ],
@@ -57,16 +57,19 @@ const CLASH_GUIDE: Record<ClashDevice, Guide> = {
     ],
   },
   router: {
-    app: "OpenClash",
-    url: "https://github.com/vernesong/OpenClash",
+    app: "Nikki",
+    url: "https://github.com/nikkinikki-org/OpenWrt-nikki",
     steps: [
-      "На роутере с OpenWrt установите OpenClash (ядро mihomo).",
-      "LuCI → Services → OpenClash → Config Manage → загрузите скачанный .yaml.",
-      "Выберите его активным конфигом → Save & Apply.",
-      "Запустите OpenClash (Enable).",
+      "На роутере с OpenWrt установите Nikki (luci-app-nikki, ядро mihomo) — английский интерфейс.",
+      "LuCI → Services → Nikki → Profiles → загрузите скачанный .yaml.",
+      "Выберите его активным профилем и сохраните (Save & Apply).",
+      "Включите Nikki (Enable) на вкладке Status.",
     ],
   },
 };
+
+const LINK_CLASS =
+  "mt-3 inline-flex items-center gap-1 text-[13px] font-semibold text-brand transition-colors hover:text-brand-hover";
 
 function Segmented<T extends string>({
   label,
@@ -80,20 +83,28 @@ function Segmented<T extends string>({
   onChange: (value: T) => void;
 }) {
   return (
-    <fieldset className="field">
-      <legend className="field-label">{label}</legend>
-      <div className="segmented">
-        {options.map((o) => (
-          <button
-            key={o.value}
-            type="button"
-            className="segment"
-            aria-pressed={value === o.value}
-            onClick={() => onChange(o.value)}
-          >
-            {o.label}
-          </button>
-        ))}
+    <fieldset className="m-0 border-0 p-0">
+      <legend className="mb-2 block text-sm font-semibold text-ink">{label}</legend>
+      <div className="flex w-full flex-wrap gap-1 rounded-full border border-hairline bg-surface-soft p-1">
+        {options.map((o) => {
+          const active = value === o.value;
+          return (
+            <button
+              key={o.value}
+              type="button"
+              aria-pressed={active}
+              onClick={() => onChange(o.value)}
+              className={[
+                "min-w-0 flex-1 cursor-pointer truncate rounded-full px-4 py-2 text-sm font-medium leading-none transition-colors",
+                active
+                  ? "bg-surface text-ink shadow-sm ring-1 ring-brand/40"
+                  : "text-body hover:text-ink",
+              ].join(" ")}
+            >
+              {o.label}
+            </button>
+          );
+        })}
       </div>
     </fieldset>
   );
@@ -102,38 +113,43 @@ function Segmented<T extends string>({
 function ImportGuide({
   format,
   device,
+  divider = false,
 }: {
   format: ConfigFormat;
   device: ClashDevice;
+  divider?: boolean;
 }) {
   const g = format === "amneziawg" ? AMNEZIA_GUIDE : CLASH_GUIDE[device];
   return (
-    <section className="guide">
-      <h3 className="guide-title">Как подключить</h3>
-      <ol className="guide-steps">
+    <section className={divider ? "mt-5 border-t border-hairline pt-5" : ""}>
+      <h3 className="mb-2.5 text-sm font-semibold text-ink">Как подключить</h3>
+      <ol className="m-0 flex list-decimal flex-col gap-1.5 pl-5 text-[13.5px] leading-relaxed text-body marker:tabular-nums marker:text-mute">
         {g.steps.map((s, i) => (
           <li key={i}>{s}</li>
         ))}
       </ol>
-      <a className="guide-link" href={g.url} target="_blank" rel="noopener noreferrer">
+      <a className={LINK_CLASS} href={g.url} target="_blank" rel="noopener noreferrer">
         Скачать {g.app} ↗
       </a>
     </section>
   );
 }
 
-function SponsorBlock({ sponsor }: { sponsor: Sponsor }) {
+function SponsorBlock({
+  sponsor,
+  divider = false,
+}: {
+  sponsor: Sponsor;
+  divider?: boolean;
+}) {
   return (
-    <aside className="callout">
-      <span className="callout-tag">{sponsor.title}</span>
-      <p className="callout-text">{sponsor.text}</p>
-      <a
-        className="callout-cta"
-        href={sponsor.url}
-        target="_blank"
-        rel="noopener noreferrer"
-      >
-        {sponsor.cta}
+    <aside className={divider ? "mt-5 border-t border-hairline pt-5" : ""}>
+      <span className="mb-2 inline-block text-[10.5px] font-bold uppercase tracking-wider text-brand">
+        {sponsor.title}
+      </span>
+      <p className="m-0 text-[13.5px] leading-relaxed text-body">{sponsor.text}</p>
+      <a className={LINK_CLASS} href={sponsor.url} target="_blank" rel="noopener noreferrer">
+        {sponsor.cta} ↗
       </a>
     </aside>
   );
@@ -210,15 +226,16 @@ export default function Generator({ sponsor }: { sponsor: Sponsor | null }) {
     URL.revokeObjectURL(url);
   }
 
+  const secondaryBtn =
+    "inline-flex h-9 cursor-pointer items-center justify-center gap-1.5 rounded-full border border-hairline-strong bg-surface px-4 text-sm font-medium text-ink transition-colors hover:bg-surface-soft";
+
   return (
     <>
-      <form onSubmit={onSubmit} className="card">
-        <Segmented
-          label="Формат"
-          value={format}
-          options={FORMAT_OPTIONS}
-          onChange={setFormat}
-        />
+      <form
+        onSubmit={onSubmit}
+        className="flex flex-col gap-5 rounded-2xl border border-hairline bg-surface p-6 shadow-[0_1px_2px_rgba(0,0,0,0.04),0_20px_44px_-26px_rgba(246,130,31,0.35)]"
+      >
+        <Segmented label="Формат" value={format} options={FORMAT_OPTIONS} onChange={setFormat} />
 
         {format === "amneziawg" && (
           <Segmented
@@ -238,23 +255,25 @@ export default function Generator({ sponsor }: { sponsor: Sponsor | null }) {
           />
         )}
 
-        <Segmented
-          label="DNS"
-          value={dnsId}
-          options={DNS_OPTIONS}
-          onChange={setDnsId}
-        />
+        <Segmented label="DNS" value={dnsId} options={DNS_OPTIONS} onChange={setDnsId} />
 
-        <button type="submit" className="btn-primary" disabled={loading}>
+        <button
+          type="submit"
+          disabled={loading}
+          className="inline-flex h-12 w-full cursor-pointer items-center justify-center gap-2 rounded-full bg-brand px-5 text-sm font-semibold text-on-brand shadow-[0_10px_24px_-10px_rgba(246,130,31,0.75)] transition-all hover:-translate-y-px hover:bg-brand-hover active:translate-y-0 disabled:cursor-not-allowed disabled:bg-surface-soft disabled:text-mute disabled:shadow-none"
+        >
           {loading ? (
             <>
-              <span className="spinner" aria-hidden="true" />
+              <span
+                className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-current border-r-transparent motion-reduce:[animation-duration:1.5s]"
+                aria-hidden="true"
+              />
               Генерация…
             </>
           ) : (
             <>
               <svg
-                className="btn-icon"
+                className="flex-none"
                 width="15"
                 height="15"
                 viewBox="0 0 24 24"
@@ -271,41 +290,46 @@ export default function Generator({ sponsor }: { sponsor: Sponsor | null }) {
 
       <div aria-live="polite">
         {error && (
-          <p className="error" role="alert">
+          <p
+            className="mt-4 rounded-xl border border-hairline bg-surface-soft px-4 py-3 text-sm text-body"
+            role="alert"
+          >
             {error}
           </p>
         )}
       </div>
 
       {sponsor && (
-        <div className="guide-card callout-card">
+        <div className="mt-4 rounded-2xl border border-hairline bg-surface-soft p-6">
           <SponsorBlock sponsor={sponsor} />
         </div>
       )}
 
-      <div className="guide-card">
+      <div className="mt-4 rounded-2xl border border-hairline bg-surface-soft p-6">
         <ImportGuide format={format} device={device} />
       </div>
 
       <dialog
         ref={dialogRef}
-        className="modal"
+        className="m-auto max-h-[calc(100dvh-48px)] w-[calc(100vw-32px)] max-w-xl overflow-hidden rounded-2xl border border-hairline bg-surface p-0 text-body shadow-[0_24px_60px_-16px_rgba(0,0,0,0.45)] backdrop:bg-black/50"
         aria-labelledby="result-title"
         onClick={onBackdropClick}
         onClose={() => setCopied(false)}
       >
         {result && (
-          <div className="modal-inner">
-            <div className="modal-head">
+          <div className="flex max-h-[calc(100dvh-48px)] flex-col gap-4 overflow-y-auto p-6">
+            <div className="flex items-start justify-between gap-3">
               <div>
-                <h2 id="result-title" className="result-title">
+                <h2 id="result-title" className="text-lg font-bold text-ink">
                   {result.format === "amneziawg" ? "AmneziaWG" : "Clash"}
                 </h2>
-                <span className="result-file">{result.fileName}</span>
+                <span className="mt-1 block break-all font-mono text-xs text-mute">
+                  {result.fileName}
+                </span>
               </div>
               <button
                 type="button"
-                className="modal-close"
+                className="inline-flex h-8 w-8 flex-none cursor-pointer items-center justify-center rounded-full border border-hairline-strong bg-surface text-[13px] text-ink transition-colors hover:bg-surface-soft"
                 aria-label="Закрыть"
                 onClick={closeModal}
               >
@@ -313,29 +337,29 @@ export default function Generator({ sponsor }: { sponsor: Sponsor | null }) {
               </button>
             </div>
 
-            <div className="terminal">
-              <div className="terminal-bar" aria-hidden="true">
-                <span className="dot dot-r" />
-                <span className="dot dot-y" />
-                <span className="dot dot-g" />
+            <div className="overflow-hidden rounded-xl border border-hairline bg-canvas">
+              <div className="flex items-center gap-2 border-b border-hairline px-4 py-3" aria-hidden="true">
+                <span className="h-3 w-3 rounded-full bg-term-red" />
+                <span className="h-3 w-3 rounded-full bg-term-yellow" />
+                <span className="h-3 w-3 rounded-full bg-term-green" />
               </div>
-              <pre>
+              <pre className="m-0 max-h-[min(360px,52dvh)] overflow-auto p-4 font-mono text-[13px] leading-relaxed whitespace-pre text-ink [tab-size:2]">
                 <code>{result.config}</code>
               </pre>
             </div>
 
-            <div className="actions">
-              <button type="button" className="btn-secondary" onClick={onCopy}>
+            <div className="flex flex-wrap gap-2">
+              <button type="button" className={secondaryBtn} onClick={onCopy}>
                 {copied ? "Скопировано" : "Копировать"}
               </button>
-              <button type="button" className="btn-secondary" onClick={onDownload}>
+              <button type="button" className={secondaryBtn} onClick={onDownload}>
                 Скачать
               </button>
             </div>
 
-            {sponsor && <SponsorBlock sponsor={sponsor} />}
+            {sponsor && <SponsorBlock sponsor={sponsor} divider />}
 
-            <ImportGuide format={result.format} device={device} />
+            <ImportGuide format={result.format} device={device} divider />
           </div>
         )}
       </dialog>

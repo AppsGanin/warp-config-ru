@@ -11,19 +11,23 @@ export interface AmneziaWGParams {
   clientIPv6: string;
   dnsId: DnsId;
   endpoint: string;
+  ipv6: boolean;
 }
 
 /**
- * Builds an AmneziaWG 1.5 (.conf) config. The awg1.5 obfuscation set is the
- * fixed junk/magic-header parameters plus a random `I1` QUIC-mimicry signature.
+ * Builds an AmneziaWG 1.5 (.conf) config for Cloudflare WARP. WARP is a standard
+ * WireGuard server, so headers (H1–H4) and padding (S1/S2) stay at standard
+ * values — only the junk (Jc) and I1 signature survive against it.
  */
 export function buildAmneziaWG(p: AmneziaWGParams): string {
-  const dns = dnsList(p.dnsId, true).join(", ");
+  const dns = dnsList(p.dnsId, p.ipv6).join(", ");
+  const address = p.ipv6 ? `${p.clientIPv4}, ${p.clientIPv6}` : p.clientIPv4;
+  const allowedIPs = p.ipv6 ? "0.0.0.0/0, ::/0" : "0.0.0.0/0";
 
   const iface = [
     "[Interface]",
     `PrivateKey = ${p.privateKey}`,
-    `Address = ${p.clientIPv4}, ${p.clientIPv6}`,
+    `Address = ${address}`,
     `DNS = ${dns}`,
     `MTU = ${MTU}`,
     "S1 = 0",
@@ -41,7 +45,7 @@ export function buildAmneziaWG(p: AmneziaWGParams): string {
   const peer = [
     "[Peer]",
     `PublicKey = ${p.peerPublicKey}`,
-    "AllowedIPs = 0.0.0.0/0, ::/0",
+    `AllowedIPs = ${allowedIPs}`,
     `Endpoint = ${p.endpoint}`,
     "PersistentKeepalive = 25",
   ].join("\n");

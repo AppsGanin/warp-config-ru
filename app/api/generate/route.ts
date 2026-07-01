@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
 import { generateConfig } from "@/lib/warp";
-import type { ApiResponse, ClashDevice, DnsId, EndpointId } from "@/types";
+import { WARP_PORTS, DEFAULT_PORT } from "@/types";
+import type { ApiResponse, ClashDevice, DnsId, WarpPort } from "@/types";
+import { ENDPOINT_HOSTS, DEFAULT_HOST_ID } from "@/config/endpoints";
 
 // Registration calls Cloudflare per request and must never be cached; needs the
-// Node runtime for node:crypto key generation.
+// Node runtime for node:crypto key generation and node:net endpoint probing.
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+
+const HOST_IDS = new Set(ENDPOINT_HOSTS.map((h) => h.id));
 
 export async function POST(req: Request): Promise<NextResponse<ApiResponse>> {
   let body: unknown;
@@ -22,12 +26,25 @@ export async function POST(req: Request): Promise<NextResponse<ApiResponse>> {
   }
   const format = b.format;
   const dnsId: DnsId = b.dnsId === "xbox" ? "xbox" : "geohide";
-  const endpointId: EndpointId | undefined = b.endpointId === "alt" ? "alt" : "default";
+
+  const endpointHostId =
+    typeof b.endpointHostId === "string" && HOST_IDS.has(b.endpointHostId)
+      ? b.endpointHostId
+      : DEFAULT_HOST_ID;
+  const port: WarpPort = WARP_PORTS.includes(b.port as WarpPort) ? (b.port as WarpPort) : DEFAULT_PORT;
+  const ipv6 = b.ipv6 !== false;
   const device: ClashDevice | undefined =
     b.device === "mobile" || b.device === "router" ? b.device : "computer";
 
   try {
-    const data = await generateConfig({ format, dnsId, endpointId, device });
+    const data = await generateConfig({
+      format,
+      dnsId,
+      endpointHostId,
+      port,
+      ipv6,
+      device,
+    });
     return NextResponse.json({ success: true, data });
   } catch (err) {
     console.error("generate error:", err);

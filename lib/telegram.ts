@@ -1,10 +1,11 @@
 import { generateConfig } from "./warp";
 import { DNS_PROVIDERS } from "@/config/dns";
-import { ENDPOINTS } from "@/config/endpoints";
+import { ENDPOINT_HOSTS, endpointLabel } from "@/config/endpoints";
 import { CLASH_DEVICES } from "@/config/clash-templates";
 import { SPONSOR, isSponsorEnabled } from "@/config/sponsor";
 import { DONATE_URL } from "@/config/donate";
-import type { ClashDevice, ConfigFormat, DnsId, EndpointId } from "@/types";
+import { DEFAULT_PORT } from "@/types";
+import type { ClashDevice, ConfigFormat, DnsId } from "@/types";
 
 // Shared Telegram-bot logic, used by the webhook route (app/api/telegram).
 // Reuses generateConfig as-is; the UI is a small inline-keyboard wizard.
@@ -44,7 +45,6 @@ const btn = (text: string, callback_data: string): Btn => ({ text, callback_data
 const link = (text: string, url: string): Btn => ({ text, url });
 const esc = (s: string) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
-const endpointLabel = (id: string) => ENDPOINTS.find((e) => e.id === id)?.label ?? id;
 const deviceLabel = (id: string) => CLASH_DEVICES.find((d) => d.id === id)?.label ?? id;
 const dnsLabel = (id: string) => DNS_PROVIDERS.find((p) => p.id === id)?.label ?? id;
 
@@ -114,7 +114,7 @@ function formatMenu(): Menu {
 function endpointMenu(): Menu {
   return {
     text: `${FORMAT.amneziawg.emoji} <b>AmneziaWG</b>\n\n<b>Шаг 2 из 3</b> · Эндпоинт`,
-    rows: [...ENDPOINTS.map((e) => [btn(e.label, `e:${e.id}`)]), [btn("‹ Назад", "back:format")]],
+    rows: [...ENDPOINT_HOSTS.map((e) => [btn(e.label, `e:${e.id}`)]), [btn("‹ Назад", "back:format")]],
   };
 }
 
@@ -207,7 +207,9 @@ async function onCallback(cq: TgCallback): Promise<void> {
       const result = await generateConfig({
         format,
         dnsId,
-        endpointId: format === "amneziawg" ? ((p2 === "alt" ? "alt" : "default") as EndpointId) : undefined,
+        endpointHostId: format === "amneziawg" ? p2 : undefined,
+        port: format === "amneziawg" ? DEFAULT_PORT : undefined,
+        ipv6: true,
         device:
           format === "clash"
             ? ((p2 === "mobile" || p2 === "router" ? p2 : "computer") as ClashDevice)

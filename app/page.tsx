@@ -1,5 +1,6 @@
 import Generator from "@/components/Generator";
 import ThemeToggle from "@/components/ThemeToggle";
+import HistoryButton from "@/components/HistoryButton";
 import { SPONSOR, isSponsorEnabled } from "@/config/sponsor";
 import { DONATE_URL } from "@/config/donate";
 
@@ -7,7 +8,8 @@ export default function Home() {
   const sponsor = isSponsorEnabled() ? SPONSOR : null;
   return (
     <main className="flex min-h-dvh flex-col items-center px-5 pb-10 pt-6 [background:var(--page-glow)]">
-      <div className="flex w-full max-w-xl items-center justify-end">
+      <div className="flex w-full max-w-xl items-center justify-end gap-2">
+        <HistoryButton />
         <ThemeToggle />
       </div>
 

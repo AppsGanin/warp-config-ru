@@ -1,27 +1,38 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { CLASH_DEVICES } from "@/config/clash-templates";
+import { DNS_PROVIDERS } from "@/config/dns";
+import { DONATE_URL } from "@/config/donate";
+import { DEFAULT_HOST_ID, ENDPOINT_HOSTS } from "@/config/endpoints";
+import type { Sponsor } from "@/config/sponsor";
+import { copyConfig, download, saveEntry } from "@/lib/history";
 import type {
   ApiResponse,
   ClashDevice,
   ConfigFormat,
+  ConfigMeta,
   DnsId,
-  EndpointId,
   GenerateResult,
+  WarpPort,
 } from "@/types";
-import { DNS_PROVIDERS } from "@/config/dns";
-import { ENDPOINTS } from "@/config/endpoints";
-import { CLASH_DEVICES } from "@/config/clash-templates";
-import type { Sponsor } from "@/config/sponsor";
-import { DONATE_URL } from "@/config/donate";
+import { DEFAULT_PORT, WARP_PORTS } from "@/types";
+import { useRef, useState } from "react";
 
 const FORMAT_OPTIONS: readonly { value: ConfigFormat; label: string }[] = [
   { value: "amneziawg", label: "Amnezia" },
   { value: "clash", label: "Clash" },
 ];
 const DNS_OPTIONS = DNS_PROVIDERS.map((p) => ({ value: p.id, label: p.label }));
-const ENDPOINT_OPTIONS = ENDPOINTS.map((e) => ({ value: e.id, label: e.label }));
 const DEVICE_OPTIONS = CLASH_DEVICES.map((d) => ({ value: d.id, label: d.label }));
+const HOST_OPTIONS = ENDPOINT_HOSTS.map((h) => ({ value: h.id, label: h.label }));
+const PORT_OPTIONS = WARP_PORTS.map((p) => ({ value: String(p), label: String(p) }));
+
+const SOURCE_LABEL: Record<NonNullable<ConfigMeta["endpointSource"]>, string> = {
+  auto: "авто",
+  "manual-ip": "выбрано",
+  hostname: "hostname",
+  fallback: "резерв",
+};
 
 type Guide = { app: string; url: string; steps: string[] };
 
@@ -111,6 +122,108 @@ function Segmented<T extends string>({
   );
 }
 
+function Select({
+  label,
+  value,
+  options,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  options: readonly { value: string; label: string }[];
+  onChange: (value: string) => void;
+}) {
+  return (
+    <fieldset className="m-0 border-0 p-0">
+      <legend className="mb-2 block text-sm font-semibold text-ink">{label}</legend>
+      <div className="relative">
+        <select
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full cursor-pointer appearance-none rounded-full border border-hairline bg-surface-soft px-4 py-2.5 pr-9 text-sm font-medium text-ink outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+        >
+          {options.map((o) => (
+            <option key={o.value} value={o.value}>
+              {o.label}
+            </option>
+          ))}
+        </select>
+        <svg
+          className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-mute"
+          width="12"
+          height="12"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="3"
+          aria-hidden="true"
+        >
+          <path d="M6 9l6 6 6-6" />
+        </svg>
+      </div>
+    </fieldset>
+  );
+}
+
+function Toggle({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}) {
+  return (
+    <label className="flex cursor-pointer items-center justify-between gap-3">
+      <span className="text-sm font-semibold text-ink">{label}</span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        onClick={() => onChange(!checked)}
+        className={[
+          "relative h-6 w-11 flex-none rounded-full transition-colors",
+          checked ? "bg-brand" : "bg-hairline-strong",
+        ].join(" ")}
+      >
+        <span
+          className={[
+            "absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow-md ring-1 ring-black/5 transition-transform",
+            checked ? "translate-x-5" : "translate-x-0",
+          ].join(" ")}
+        />
+      </button>
+    </label>
+  );
+}
+
+function Diagnostics({ meta }: { meta: ConfigMeta }) {
+  const rows: [string, string][] = [];
+  if (meta.format === "amneziawg") {
+    rows.push(["Формат", "AmneziaWG"]);
+    if (meta.endpoint) {
+      const src = meta.endpointSource ? ` · ${SOURCE_LABEL[meta.endpointSource]}` : "";
+      rows.push(["Endpoint", `${meta.endpoint}${src}`]);
+    }
+    rows.push(["IPv6", meta.ipv6 ? "включён" : "выключен"]);
+  } else {
+    rows.push(["Формат", `Clash${meta.device ? ` · ${meta.device}` : ""}`]);
+  }
+  rows.push(["DNS", meta.dnsLabel]);
+
+  return (
+    <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 rounded-xl border border-hairline bg-surface-soft px-4 py-3 text-[13px]">
+      {rows.map(([k, v]) => (
+        <div key={k} className="contents">
+          <dt className="text-mute">{k}</dt>
+          <dd className="m-0 break-all font-mono text-ink">{v}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
 function ImportGuide({
   format,
   device,
@@ -159,7 +272,9 @@ function SponsorBlock({
 export default function Generator({ sponsor }: { sponsor: Sponsor | null }) {
   const [format, setFormat] = useState<ConfigFormat>("amneziawg");
   const [dnsId, setDnsId] = useState<DnsId>("geohide");
-  const [endpointId, setEndpointId] = useState<EndpointId>("default");
+  const [endpointHostId, setEndpointHostId] = useState<string>(DEFAULT_HOST_ID);
+  const [port, setPort] = useState<WarpPort>(DEFAULT_PORT);
+  const [ipv6, setIpv6] = useState(true);
   const [device, setDevice] = useState<ClashDevice>("computer");
 
   const [loading, setLoading] = useState(false);
@@ -178,7 +293,7 @@ export default function Generator({ sponsor }: { sponsor: Sponsor | null }) {
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ format, dnsId, endpointId, device }),
+        body: JSON.stringify({ format, dnsId, endpointHostId, port, ipv6, device }),
       });
       const json = (await res.json()) as ApiResponse;
       if (!json.success) {
@@ -186,6 +301,7 @@ export default function Generator({ sponsor }: { sponsor: Sponsor | null }) {
         return;
       }
       setResult(json.data);
+      saveEntry(json.data);
       setCopied(false);
       dialogRef.current?.showModal();
     } catch {
@@ -205,26 +321,12 @@ export default function Generator({ sponsor }: { sponsor: Sponsor | null }) {
 
   async function onCopy() {
     if (!result) return;
-    try {
-      await navigator.clipboard.writeText(result.config);
+    if (await copyConfig(result.config)) {
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1500);
-    } catch {
+    } else {
       setError("Не удалось скопировать в буфер обмена.");
     }
-  }
-
-  function onDownload() {
-    if (!result) return;
-    const blob = new Blob([result.config], { type: "text/plain;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = result.fileName;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
   }
 
   const secondaryBtn =
@@ -239,12 +341,20 @@ export default function Generator({ sponsor }: { sponsor: Sponsor | null }) {
         <Segmented label="Формат" value={format} options={FORMAT_OPTIONS} onChange={setFormat} />
 
         {format === "amneziawg" && (
-          <Segmented
-            label="Эндпоинт"
-            value={endpointId}
-            options={ENDPOINT_OPTIONS}
-            onChange={setEndpointId}
-          />
+          <>
+            <Select
+              label="Endpoint"
+              value={endpointHostId}
+              options={HOST_OPTIONS}
+              onChange={setEndpointHostId}
+            />
+            <Select
+              label="Порт"
+              value={String(port)}
+              options={PORT_OPTIONS}
+              onChange={(v) => setPort(Number(v) as WarpPort)}
+            />
+          </>
         )}
 
         {format === "clash" && (
@@ -257,6 +367,8 @@ export default function Generator({ sponsor }: { sponsor: Sponsor | null }) {
         )}
 
         <Segmented label="DNS" value={dnsId} options={DNS_OPTIONS} onChange={setDnsId} />
+
+        {format === "amneziawg" && <Toggle label="IPv6" checked={ipv6} onChange={setIpv6} />}
 
         <button
           type="submit"
@@ -338,6 +450,8 @@ export default function Generator({ sponsor }: { sponsor: Sponsor | null }) {
               </button>
             </div>
 
+            <Diagnostics meta={result.meta} />
+
             <div className="overflow-hidden rounded-xl border border-hairline bg-canvas">
               <div className="flex items-center gap-2 border-b border-hairline px-4 py-3" aria-hidden="true">
                 <span className="h-3 w-3 rounded-full bg-term-red" />
@@ -353,7 +467,11 @@ export default function Generator({ sponsor }: { sponsor: Sponsor | null }) {
               <button type="button" className={secondaryBtn} onClick={onCopy}>
                 {copied ? "Скопировано" : "Копировать"}
               </button>
-              <button type="button" className={secondaryBtn} onClick={onDownload}>
+              <button
+                type="button"
+                className={secondaryBtn}
+                onClick={() => download(result.fileName, result.config)}
+              >
                 Скачать
               </button>
             </div>
@@ -366,7 +484,7 @@ export default function Generator({ sponsor }: { sponsor: Sponsor | null }) {
               href={DONATE_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-full border border-brand/40 bg-brand/10 px-6 text-[15px] font-semibold text-brand transition-colors hover:bg-brand/20"
+              className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-full border border-brand/40 bg-brand/10 px-6 py-2 text-[15px] font-semibold text-brand transition-colors hover:bg-brand/20"
             >
               <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
